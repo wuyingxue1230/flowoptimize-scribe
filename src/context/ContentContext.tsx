@@ -9,6 +9,7 @@ export interface TextModification {
   original: string;
   reason: string;
   suggestion?: string;
+  reasoning?: string; // 新增：优化思路
 }
 
 interface ContentContextProps {
@@ -98,11 +99,15 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setIsProcessing(true);
     setOriginalContent(content);
     setOptimizedContent(""); // 清空之前的结果
+    setTextModifications([]); // 清空之前的修改建议
     
     try {
-      // 使用LLM分析可修改部分
-      const modifications = await analyzeTextModifications(content);
-      setTextModifications(modifications);
+      // 初始化修改建议
+      setTextModifications([{
+        original: content,
+        reason: "正在生成优化建议...",
+        suggestion: ""
+      }]);
       
       // 开始流式输出
       setIsStreaming(true);
@@ -112,9 +117,14 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         content, 
         currentPromptType, 
         customPrompt,
-        (chunkContent) => {
+        (chunkContent, suggestions) => {
           // 处理流式输出的回调函数
           setOptimizedContent(chunkContent);
+          
+          // 如果有提供建议，则更新修改建议
+          if (suggestions) {
+            setTextModifications(suggestions);
+          }
         }
       );
       

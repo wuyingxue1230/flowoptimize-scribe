@@ -25,7 +25,7 @@ export const getPromptForType = (type: OptimizationType, customPromptValue: stri
   }
 };
 
-// 使用LLM分析文本的可修改部分
+// 使用LLM分析文本的可修改部分 - 简化为整体分析
 export async function analyzeText(content: string) {
   try {
     if (!SILICON_FLOW_API_KEY) {
@@ -33,86 +33,14 @@ export async function analyzeText(content: string) {
       throw new Error("API密钥未配置");
     }
 
-    const response = await fetch(SILICON_FLOW_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SILICON_FLOW_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: DEFAULT_MODEL,
-        messages: [
-          { 
-            role: "user", 
-            content: `分析以下文本，找出可以改进的部分，包括表达不清、用词重复、语法错误等问题：
-                    
-                    ${content}
-                    
-                    对于每个问题部分，请提供：
-                    1. 原始文本
-                    2. 问题原因
-                    3. 改进建议
-                    
-                    请使用以下JSON格式输出结果：
-                    [
-                      {
-                        "original": "问题文本",
-                        "reason": "问题原因",
-                        "suggestion": "改进建议"
-                      },
-                      ...
-                    ]`
-          }
-        ],
-        temperature: 0.7,
-        response_format: { 
-          type: "json_object" 
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    // 解析API响应
-    const responseContent = data.choices?.[0]?.message?.content;
-    if (!responseContent) {
-      return { modifications: [] };
-    }
-    
-    // 解析JSON字符串
-    let jsonData;
-    try {
-      // 尝试直接解析返回内容
-      jsonData = typeof responseContent === 'string' ? JSON.parse(responseContent) : responseContent;
-    } catch (e) {
-      // 如果直接解析失败，尝试提取JSON部分
-      const jsonMatch = responseContent.match(/\[\s*\{.*\}\s*\]/s);
-      if (jsonMatch) {
-        jsonData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("无法从响应中提取JSON数据");
+    // 直接进行整体分析
+    const modifications = [
+      {
+        original: content,
+        reason: "整体优化建议",
+        suggestion: "在分析完成后将显示优化建议"
       }
-    }
-    
-    // 确保结果是数组
-    let modifications = [];
-    if (Array.isArray(jsonData)) {
-      modifications = jsonData.map(item => ({
-        original: item.original || "",
-        reason: item.reason || "",
-        suggestion: item.suggestion || ""
-      }));
-    } else if (jsonData.modifications && Array.isArray(jsonData.modifications)) {
-      modifications = jsonData.modifications.map(item => ({
-        original: item.original || "",
-        reason: item.reason || "",
-        suggestion: item.suggestion || ""
-      }));
-    }
+    ];
     
     return { modifications };
   } catch (error) {
@@ -121,12 +49,12 @@ export async function analyzeText(content: string) {
   }
 }
 
-// 优化内容 - 支持流式输出
+// 优化内容 - 支持流式输出，同时返回整体优化建议
 export async function optimizeText(
   content: string, 
   promptType: OptimizationType, 
   customPrompt: string = "", 
-  onProgress?: (chunk: string) => void
+  onProgress?: (chunk: string, suggestions?: any) => void
 ) {
   try {
     if (!SILICON_FLOW_API_KEY) {
@@ -139,6 +67,52 @@ export async function optimizeText(
     
     // 如果提供了进度回调函数，使用流式输出
     if (onProgress) {
+      // 先获取优化思路（非流式请求）
+      const reasoningResponse = await fetch(SILICON_FLOW_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SILICON_FLOW_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: DEFAULT_MODEL,
+          messages: [
+            { 
+              role: "user", 
+              content: `${prompt}\n\n${content}\n\n分析这段内容需要优化的地方，解释你的优化思路和计划。请简明扼要地总结你将如何改进这段内容，而不是直接给出改进后的内容。`
+            }
+          ],
+          temperature: 0.7
+        })
+      });
+      
+      if (!reasoningResponse.ok) {
+        console.warn("获取优化思路失败:", reasoningResponse.status);
+      }
+      
+      let optimizationReasoning = "优化思路生成中...";
+      
+      try {
+        const reasoningData = await reasoningResponse.json();
+        optimizationReasoning = reasoningData.choices?.[0]?.message?.content || "无法获取优化思路";
+      } catch (e) {
+        console.error("解析优化思路时出错:", e);
+      }
+      
+      // 更新初始建议
+      const initialModifications = [
+        {
+          original: content,
+          reason: "优化思路",
+          suggestion: "",
+          reasoning: optimizationReasoning
+        }
+      ];
+      
+      // 调用回调函数更新建议
+      onProgress("", initialModifications);
+      
+      // 然后获取流式优化内容
       const response = await fetch(SILICON_FLOW_API_URL, {
         method: 'POST',
         headers: {
@@ -150,7 +124,7 @@ export async function optimizeText(
           messages: [
             { 
               role: "user", 
-              content: `${prompt}\n\n${content}`
+              content: `${prompt}\n\n${content}\n\n请提供优化后的内容，无需详细解释修改过程，只需直接给出优化结果。`
             }
           ],
           temperature: 0.7,
@@ -205,10 +179,56 @@ export async function optimizeText(
         }
       }
       
-      // 返回完整内容
-      return { optimizedContent: fullContent };
+      // 优化完成后，创建整体优化建议
+      const modifications = [
+        {
+          original: content,
+          reason: "优化思路",
+          suggestion: fullContent,
+          reasoning: optimizationReasoning
+        }
+      ];
+      
+      // 调用回调函数更新建议
+      onProgress(fullContent, modifications);
+      
+      // 返回完整内容和建议
+      return { 
+        optimizedContent: fullContent,
+        modifications: modifications
+      };
     } else {
-      // 非流式请求保持不变
+      // 非流式请求，同时获取优化内容和思路
+      const reasoningResponse = await fetch(SILICON_FLOW_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SILICON_FLOW_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: DEFAULT_MODEL,
+          messages: [
+            { 
+              role: "user", 
+              content: `${prompt}\n\n${content}\n\n分析这段内容需要优化的地方，解释你的优化思路和计划。请简明扼要地总结你将如何改进这段内容，而不是直接给出改进后的内容。`
+            }
+          ],
+          temperature: 0.7
+        })
+      });
+      
+      let optimizationReasoning = "无法获取优化思路";
+      
+      if (reasoningResponse.ok) {
+        try {
+          const reasoningData = await reasoningResponse.json();
+          optimizationReasoning = reasoningData.choices?.[0]?.message?.content || "无法获取优化思路";
+        } catch (e) {
+          console.error("解析优化思路时出错:", e);
+        }
+      }
+      
+      // 获取优化内容
       const response = await fetch(SILICON_FLOW_API_URL, {
         method: 'POST',
         headers: {
@@ -220,7 +240,7 @@ export async function optimizeText(
           messages: [
             { 
               role: "user", 
-              content: `${prompt}\n\n${content}`
+              content: `${prompt}\n\n${content}\n\n请提供优化后的内容，无需详细解释修改过程，只需直接给出优化结果。`
             }
           ],
           temperature: 0.7
@@ -238,7 +258,20 @@ export async function optimizeText(
         throw new Error("API返回的优化内容为空");
       }
       
-      return { optimizedContent };
+      // 创建整体优化建议
+      const modifications = [
+        {
+          original: content,
+          reason: "优化思路",
+          suggestion: optimizedContent,
+          reasoning: optimizationReasoning
+        }
+      ];
+      
+      return { 
+        optimizedContent,
+        modifications
+      };
     }
   } catch (error) {
     console.error('优化请求时出错:', error);

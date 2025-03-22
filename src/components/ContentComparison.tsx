@@ -69,37 +69,25 @@ const ContentComparison: FC<ContentComparisonProps> = ({
       );
     }
     
+    // 只显示整体优化建议
+    const mod = textModifications[0];
+    
     return (
-      <Accordion type="single" collapsible className="w-full">
-        {textModifications.map((mod, index) => (
-          <AccordionItem key={index} value={`item-${index}`} className="border-b border-border/40">
-            <AccordionTrigger className="text-sm py-2 hover:no-underline">
-              <div className="flex items-center text-left">
-                <Badge variant="outline" className="mr-2 bg-amber-500/10 text-amber-600 border-amber-200">
-                  建议 {index + 1}
-                </Badge>
-                <span className="truncate max-w-[200px]">{mod.original.substring(0, 20)}...</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="text-sm">
-              <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-md">
-                <p className="font-medium mb-1">原文:</p>
-                <p className="mb-2 text-muted-foreground">{mod.original}</p>
-                
-                <p className="font-medium mb-1">问题:</p>
-                <p className="mb-2 text-amber-700 dark:text-amber-400">{mod.reason}</p>
-                
-                {mod.suggestion && (
-                  <>
-                    <p className="font-medium mb-1">建议:</p>
-                    <p className="text-emerald-700 dark:text-emerald-400">{mod.suggestion}</p>
-                  </>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-md">
+        <p className="font-medium mb-2">优化思路:</p>
+        
+        {isStreaming && !mod.reasoning ? (
+          <p className="text-muted-foreground animate-pulse">正在生成优化思路...</p>
+        ) : (
+          <div className="text-amber-700 dark:text-amber-400 mb-4 whitespace-pre-line">
+            {mod.reasoning || "无优化思路可显示"}
+          </div>
+        )}
+        
+        {isStreaming && !mod.suggestion ? (
+          <p className="text-muted-foreground animate-pulse">正在生成优化内容...</p>
+        ) : null}
+      </div>
     );
   };
   
@@ -142,7 +130,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
               "h-7 w-7 rounded-full",
               showModifications && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             )}
-            title="显示/隐藏修改建议"
+            title="显示/隐藏优化思路"
           >
             <Lightbulb className="h-4 w-4" />
           </Button>
@@ -156,9 +144,9 @@ const ContentComparison: FC<ContentComparisonProps> = ({
         <div className="mb-4 p-3 bg-amber-50/50 dark:bg-amber-950/10 rounded-md border border-amber-200/50 dark:border-amber-800/30">
           <div className="flex items-center mb-2">
             <MessageCircle className="h-4 w-4 text-amber-600 mr-2" />
-            <h4 className="text-sm font-medium">AI修改建议 ({textModifications.length})</h4>
+            <h4 className="text-sm font-medium">优化思路</h4>
           </div>
-          <div className="max-h-[200px] overflow-y-auto">
+          <div>
             {renderTextModifications()}
           </div>
         </div>

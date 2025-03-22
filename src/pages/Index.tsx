@@ -30,7 +30,7 @@ const Index: FC = () => {
         <header className="mb-6 text-center">
           <h1 className="heading-1 mb-2">内容优化工具</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            利用AI辅助优化您的内容。输入文本，选择优化选项，通过LLM分析原文可修改部分并回复优化结果。
+            利用AI辅助优化您的内容。输入文本，选择优化选项，即可获得实时流式输出的优化内容与详细优化思路。
           </p>
           <div className="inline-flex items-center mt-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/40 px-3 py-1 rounded-full">
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
