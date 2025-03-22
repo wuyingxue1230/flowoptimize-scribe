@@ -35,7 +35,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
   const handleCopy = () => {
     navigator.clipboard.writeText(optimized);
     setCopied(true);
-    toast.success("Optimized content copied to clipboard");
+    toast.success("优化内容已复制到剪贴板");
     
     setTimeout(() => {
       setCopied(false);
@@ -44,14 +44,14 @@ const ContentComparison: FC<ContentComparisonProps> = ({
   
   const handleAccept = () => {
     onAccept(optimized);
-    toast.success("Optimized content accepted");
+    toast.success("已接受优化内容");
   };
   
   if (isLoading) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-6 glass-card rounded-lg animate-pulse">
         <RefreshCcw className="h-8 w-8 text-primary animate-spin mb-4" />
-        <p className="text-muted-foreground">Optimizing content...</p>
+        <p className="text-muted-foreground">正在优化内容...</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-6 glass-card rounded-lg">
         <ArrowDown className="h-8 w-8 text-muted-foreground mb-4" />
-        <p className="text-muted-foreground">Optimized content will appear here</p>
+        <p className="text-muted-foreground">优化后的内容将显示在这里</p>
       </div>
     );
   }
@@ -71,9 +71,9 @@ const ContentComparison: FC<ContentComparisonProps> = ({
       showComparison ? "opacity-100" : "opacity-0"
     )}>
       <div className="flex items-center justify-between mb-4">
-        <div className="chip">Optimized Result</div>
+        <div className="chip">优化结果</div>
         <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-200">
-          Improved
+          已改进
         </Badge>
       </div>
       
@@ -93,7 +93,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
           ) : (
             <Copy className="h-4 w-4 mr-1" />
           )}
-          Copy
+          复制
         </Button>
         
         <Button
@@ -101,7 +101,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
           className="glass bg-primary/90 text-white hover:bg-primary"
         >
           <Check className="h-4 w-4 mr-1" />
-          Accept
+          接受
         </Button>
       </div>
     </div>

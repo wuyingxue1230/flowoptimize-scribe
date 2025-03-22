@@ -19,7 +19,7 @@ const Index: FC = () => {
   } = useContent();
   
   useEffect(() => {
-    document.title = "FlowOptimize Scribe - Content Editor";
+    document.title = "FlowOptimize 写作助手 - 内容编辑";
   }, []);
   
   return (
@@ -28,9 +28,9 @@ const Index: FC = () => {
       
       <main className="container mx-auto px-4 py-6">
         <header className="mb-6 text-center">
-          <h1 className="heading-1 mb-2">Content Optimization</h1>
+          <h1 className="heading-1 mb-2">内容优化工具</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Refine your content with AI assistance. Enter your text, select optimization options, and see the magic happen.
+            利用AI辅助优化您的内容。输入文本，选择优化选项，即刻见证神奇效果。
           </p>
         </header>
         

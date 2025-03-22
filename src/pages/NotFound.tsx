@@ -10,11 +10,11 @@ const NotFound = () => {
 
   useEffect(() => {
     console.error(
-      "404 Error: User attempted to access non-existent route:",
+      "404 错误: 用户尝试访问不存在的路由:",
       location.pathname
     );
     
-    document.title = "FlowOptimize Scribe - Page Not Found";
+    document.title = "FlowOptimize Scribe - 页面未找到";
   }, [location.pathname]);
 
   return (
@@ -22,14 +22,14 @@ const NotFound = () => {
       <div className="glass-card p-8 rounded-lg max-w-md w-full text-center">
         <h1 className="heading-1 mb-2">404</h1>
         <p className="text-muted-foreground mb-6">
-          The page you're looking for doesn't exist or has been moved.
+          您访问的页面不存在或已被移动。
         </p>
         <Button 
           onClick={() => navigate("/")}
           className="glass"
         >
           <Home className="h-4 w-4 mr-2" />
-          Return to Home
+          返回首页
         </Button>
       </div>
     </div>

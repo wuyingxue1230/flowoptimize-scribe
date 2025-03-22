@@ -30,12 +30,12 @@ interface PromptPanelProps {
 }
 
 const promptDescriptions: Record<OptimizationType, string> = {
-  improve: "General improvement for clarity and effectiveness",
-  simplify: "Make the content easier to understand",
-  persuasive: "Enhance persuasiveness and conversion potential",
-  professional: "Refine for a professional, business context",
-  creative: "Make the content more engaging and creative",
-  custom: "Use your own custom prompt",
+  improve: "全面提升内容的清晰度和效果",
+  simplify: "使内容更容易理解",
+  persuasive: "增强说服力和转化潜力",
+  professional: "使内容更专业、更适合商业场景",
+  creative: "使内容更有吸引力和创意",
+  custom: "使用您自定义的提示词",
 };
 
 const PromptPanel: FC<PromptPanelProps> = ({ 
@@ -68,7 +68,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
       >
         <div className="flex items-center space-x-2">
           <Sparkles className="h-4 w-4 text-primary" />
-          <h3 className="font-medium">Optimization Options</h3>
+          <h3 className="font-medium">优化选项</h3>
         </div>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
           {expanded ? (
@@ -101,7 +101,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <Zap className="h-4 w-4 mr-2 text-primary" />
-                <span>Improve</span>
+                <span>改进</span>
               </Label>
             </div>
             
@@ -117,7 +117,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <Type className="h-4 w-4 mr-2 text-primary" />
-                <span>Simplify</span>
+                <span>简化</span>
               </Label>
             </div>
             
@@ -133,7 +133,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <Megaphone className="h-4 w-4 mr-2 text-primary" />
-                <span>Persuasive</span>
+                <span>说服力</span>
               </Label>
             </div>
             
@@ -149,7 +149,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <Target className="h-4 w-4 mr-2 text-primary" />
-                <span>Professional</span>
+                <span>专业化</span>
               </Label>
             </div>
             
@@ -165,7 +165,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <Sparkles className="h-4 w-4 mr-2 text-primary" />
-                <span>Creative</span>
+                <span>创意</span>
               </Label>
             </div>
             
@@ -181,7 +181,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
                 className="flex items-center cursor-pointer w-full"
               >
                 <MessageCircle className="h-4 w-4 mr-2 text-primary" />
-                <span>Custom</span>
+                <span>自定义</span>
               </Label>
             </div>
           </RadioGroup>
@@ -195,7 +195,7 @@ const PromptPanel: FC<PromptPanelProps> = ({
           {selectedType === "custom" && (
             <div className="animate-fade-in">
               <Textarea
-                placeholder="Enter your custom optimization instructions..."
+                placeholder="输入您的自定义优化指令..."
                 className="w-full glass-input resize-none"
                 value={customPrompt}
                 onChange={handleCustomPromptChange}

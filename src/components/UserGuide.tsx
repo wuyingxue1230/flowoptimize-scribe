@@ -10,24 +10,24 @@ const UserGuide: FC = () => {
   
   const steps = [
     {
-      title: "Welcome to FlowOptimize Scribe",
-      content: "A minimalist tool designed to help you optimize your content with AI assistance."
+      title: "欢迎使用 FlowOptimize 写作助手",
+      content: "这是一款简约的工具，旨在利用AI技术帮助您优化内容。"
     },
     {
-      title: "1. Enter your content",
-      content: "Start by typing or pasting your content in the editor."
+      title: "1. 输入您的内容",
+      content: "首先在编辑器中输入或粘贴您的内容。"
     },
     {
-      title: "2. Choose optimization type",
-      content: "Select how you'd like to optimize your content from the options panel."
+      title: "2. 选择优化类型",
+      content: "从选项面板中选择您希望如何优化内容。"
     },
     {
-      title: "3. Review and accept",
-      content: "Compare the original and optimized versions, then accept the changes or try again."
+      title: "3. 审阅并接受",
+      content: "比较原始版本和优化版本，然后接受更改或重试。"
     },
     {
-      title: "4. Access history",
-      content: "All your optimizations are saved in the history tab for future reference."
+      title: "4. 访问历史记录",
+      content: "所有优化记录都保存在历史记录选项卡中，以供将来参考。"
     }
   ];
   
@@ -51,7 +51,7 @@ const UserGuide: FC = () => {
         }}
       >
         <Info className="h-4 w-4 mr-1" />
-        Guide
+        使用指南
       </Button>
     );
   }
@@ -96,11 +96,11 @@ const UserGuide: FC = () => {
         >
           {step < steps.length - 1 ? (
             <>
-              Next
+              下一步
               <ChevronRight className="h-3 w-3 ml-1" />
             </>
           ) : (
-            "Get Started"
+            "开始使用"
           )}
         </Button>
       </div>

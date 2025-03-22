@@ -61,7 +61,7 @@ const HistoryItem: FC<HistoryItemProps> = ({
           onClick={() => onView(item)}
         >
           <Eye className="h-3.5 w-3.5 mr-1" />
-          View
+          查看
         </Button>
         
         <Button 
@@ -71,7 +71,7 @@ const HistoryItem: FC<HistoryItemProps> = ({
           onClick={() => onEdit(item)}
         >
           <Edit className="h-3.5 w-3.5 mr-1" />
-          Edit
+          编辑
         </Button>
         
         <Button 

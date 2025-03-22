@@ -12,7 +12,7 @@ const Navbar: FC = () => {
         <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
           <FileText className="h-4 w-4 text-white" />
         </div>
-        <h1 className="font-semibold text-lg">FlowOptimize Scribe</h1>
+        <h1 className="font-semibold text-lg">FlowOptimize 写作助手</h1>
       </div>
       
       <div className="flex items-center space-x-1">
@@ -25,7 +25,7 @@ const Navbar: FC = () => {
                 : "text-foreground/70 hover:bg-secondary/70")
           }
         >
-          Editor
+          编辑器
         </NavLink>
         
         <NavLink 
@@ -37,7 +37,7 @@ const Navbar: FC = () => {
                 : "text-foreground/70 hover:bg-secondary/70")
           }
         >
-          History
+          历史记录
         </NavLink>
         
         <Button variant="ghost" size="icon" className="ml-2">

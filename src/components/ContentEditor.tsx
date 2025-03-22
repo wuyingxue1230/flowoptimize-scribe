@@ -31,7 +31,7 @@ const ContentEditor: FC<ContentEditorProps> = ({
   
   const handleSubmit = () => {
     if (content.trim().length < 10) {
-      toast.error("Please enter at least 10 characters");
+      toast.error("请输入至少10个字符");
       return;
     }
     onSubmit(content);
@@ -40,7 +40,7 @@ const ContentEditor: FC<ContentEditorProps> = ({
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
     setCopied(true);
-    toast.success("Content copied to clipboard");
+    toast.success("内容已复制到剪贴板");
     
     setTimeout(() => {
       setCopied(false);
@@ -50,15 +50,15 @@ const ContentEditor: FC<ContentEditorProps> = ({
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-2">
-        <div className="chip">Original Content</div>
-        <div className="text-xs text-muted-foreground">{charCount} characters</div>
+        <div className="chip">原始内容</div>
+        <div className="text-xs text-muted-foreground">{charCount} 字符</div>
       </div>
       
       <div className="relative flex-1">
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Enter your content here..."
+          placeholder="在此输入您的内容..."
           className="w-full h-full min-h-[250px] resize-none p-4 rounded-lg glass-input text-base focus-visible:ring-1 focus-visible:ring-primary transition-all duration-200"
         />
         
@@ -88,7 +88,7 @@ const ContentEditor: FC<ContentEditorProps> = ({
               <RefreshCcw className="h-4 w-4 animate-spin" />
             ) : (
               <>
-                <span className="mr-1">Optimize</span>
+                <span className="mr-1">优化</span>
                 <Send className="h-3 w-3" />
               </>
             )}
