@@ -90,6 +90,20 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
   
+  // 清理文本内容，移除多余星号并保持分段
+  const cleanTextContent = (text: string): string => {
+    if (!text) return "";
+    
+    // 移除星号标记
+    let cleaned = text.replace(/\*\*/g, ""); // 移除成对星号
+    cleaned = cleaned.replace(/\*/g, "");    // 移除单个星号
+    
+    // 确保段落之间有空行
+    cleaned = cleaned.replace(/\n{3,}/g, "\n\n"); // 将多个空行替换为两个换行符
+    
+    return cleaned;
+  };
+  
   const optimizeContent = async (content: string) => {
     if (content.trim().length < 10) {
       toast.error("内容太短，无法优化");
@@ -119,7 +133,8 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         customPrompt,
         (chunkContent, suggestions) => {
           // 处理流式输出的回调函数
-          setOptimizedContent(chunkContent);
+          const cleanedContent = cleanTextContent(chunkContent);
+          setOptimizedContent(cleanedContent);
           
           // 如果有提供建议，则更新修改建议
           if (suggestions) {
@@ -142,7 +157,9 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   
   const acceptOptimization = () => {
     if (optimizedContent) {
-      setOriginalContent(optimizedContent);
+      // 确保接受的优化内容已清理
+      const cleanedContent = cleanTextContent(optimizedContent);
+      setOriginalContent(cleanedContent);
       setOptimizedContent("");
       saveToHistory();
       // 接受优化后清空修改建议
@@ -159,10 +176,13 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   
   const saveToHistory = () => {
     if (originalContent && optimizedContent) {
+      // 确保保存到历史记录的内容已清理
+      const cleanedOptimized = cleanTextContent(optimizedContent);
+      
       const newHistoryItem: ContentHistory = {
         id: Date.now().toString(),
         original: originalContent,
-        optimized: optimizedContent,
+        optimized: cleanedOptimized,
         timestamp: Date.now(),
         type: currentPromptType
       };

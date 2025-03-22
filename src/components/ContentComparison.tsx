@@ -152,7 +152,7 @@ const ContentComparison: FC<ContentComparisonProps> = ({
         </div>
       )}
       
-      <div className="flex-1 overflow-y-auto rounded-md bg-white/50 dark:bg-black/20 p-4 mb-4 text-base">
+      <div className="flex-1 overflow-y-auto rounded-md bg-white/50 dark:bg-black/20 p-4 mb-4 text-base whitespace-pre-line">
         {optimized}
         {isStreaming && (
           <span className="inline-block w-2 h-4 ml-1 bg-primary animate-pulse rounded-sm" />
