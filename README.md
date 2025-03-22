@@ -1,69 +1,80 @@
-# Welcome to your Lovable project
+# FlowOptimize 写作助手
 
-## Project info
+FlowOptimize是一款利用AI技术帮助优化内容的写作助手。通过集成SiliconFlow的LLM API，它能自动分析文本中可改进的部分，并根据不同的优化目标提供改进建议。
 
-**URL**: https://lovable.dev/projects/2db856f5-033f-4064-93bb-0520c5050d8d
+## 功能特点
 
-## How can I edit this code?
+- 内容智能优化：根据不同需求（改进、简化、专业化等）优化文本
+- 实时流式输出：优化结果实时显示，无需等待完整响应
+- 智能分析：自动识别文本中有问题的部分并提供修改建议
+- 历史记录：保存所有优化记录，方便随时查阅和比较
+- 用户友好界面：简洁直观的界面设计，易于使用
 
-There are several ways of editing your application.
+## 技术栈
 
-**Use Lovable**
+- React / Next.js
+- TailwindCSS
+- SiliconFlow LLM API
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2db856f5-033f-4064-93bb-0520c5050d8d) and start prompting.
+## 安装与设置
 
-Changes made via Lovable will be committed automatically to this repo.
+1. 克隆仓库
+```bash
+git clone https://github.com/yourusername/flowoptimize-scribe.git
+cd flowoptimize-scribe
+```
 
-**Use your preferred IDE**
+2. 安装依赖
+```bash
+npm install
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. 配置环境变量
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+在项目根目录创建一个 `.env.local` 文件，并添加以下内容：
 
-Follow these steps:
+```
+VITE_SILICON_FLOW_API_KEY=你的SiliconFlow_API_KEY
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+请将 `你的SiliconFlow_API_KEY` 替换为你在[SiliconFlow平台](https://cloud.siliconflow.cn/)申请的API密钥。
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+**注意**：由于这是一个Vite项目，前缀为`VITE_`的环境变量会被打包到前端代码中。在生产环境中，应该考虑使用更安全的方式处理API密钥，如使用后端服务中转API请求。
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. 启动开发服务器
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+5. 访问本地开发服务
+在浏览器打开 [http://localhost:5173](http://localhost:5173)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 使用说明
 
-**Use GitHub Codespaces**
+1. 在左侧编辑器中输入您想要优化的文本
+2. 在上方选择优化类型（改进、简化、专业化等）
+3. 点击"优化"按钮
+4. 右侧将显示优化后的内容，同时高亮显示原文中需要改进的部分
+5. 对比优化结果，如满意可点击"接受"保存此次优化
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## SiliconFlow API配置
 
-## What technologies are used for this project?
+本项目使用[SiliconFlow](https://cloud.siliconflow.cn/)提供的LLM API服务。要使用此功能，请：
 
-This project is built with .
+1. 在SiliconFlow官网注册账号
+2. 前往API密钥页面，创建一个新的API密钥
+3. 将密钥复制并配置到`.env.local`文件中
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+注意：API密钥应该妥善保管，该密钥在本项目中仅在服务器端使用，不会暴露给前端。
 
-## How can I deploy this project?
+## 模型说明
 
-Simply open [Lovable](https://lovable.dev/projects/2db856f5-033f-4064-93bb-0520c5050d8d) and click on Share -> Publish.
+默认使用的是`deepseek-ai/DeepSeek-V2.5`模型，如需更换其他模型，可在`src/pages/api/analyze.ts`和`src/pages/api/optimize.ts`文件中修改`DEFAULT_MODEL`变量。
 
-## I want to use a custom domain - is that possible?
+## 贡献指南
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+欢迎提交Issue和Pull Request！
+
+## 许可证
+
+[MIT](LICENSE)

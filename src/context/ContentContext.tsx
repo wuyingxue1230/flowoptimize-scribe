@@ -1,16 +1,25 @@
-
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { toast } from "sonner";
 import { OptimizationType } from "@/components/PromptPanel";
 import { ContentHistory } from "@/components/HistoryItem";
+import { analyzeText, optimizeText } from "@/lib/api";
+
+// 定义用于高亮显示可修改部分的接口
+export interface TextModification {
+  original: string;
+  reason: string;
+  suggestion?: string;
+}
 
 interface ContentContextProps {
   originalContent: string;
   optimizedContent: string;
   contentHistory: ContentHistory[];
   isProcessing: boolean;
+  isStreaming: boolean;  // 新增：标识是否正在流式输出
   currentPromptType: OptimizationType;
   customPrompt: string;
+  textModifications: TextModification[];
   setOriginalContent: (content: string) => void;
   setOptimizedContent: (content: string) => void;
   optimizeContent: (content: string) => void;
@@ -27,9 +36,11 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [originalContent, setOriginalContent] = useState("");
   const [optimizedContent, setOptimizedContent] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);  // 新增：流式输出状态
   const [currentPromptType, setCurrentPromptType] = useState<OptimizationType>("improve");
   const [customPrompt, setCustomPrompt] = useState("");
   const [contentHistory, setContentHistory] = useState<ContentHistory[]>([]);
+  const [textModifications, setTextModifications] = useState<TextModification[]>([]);
   
   // 在挂载时从localStorage加载历史记录
   useEffect(() => {
@@ -66,6 +77,18 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
   
+  // 使用LLM分析文本的可修改部分
+  const analyzeTextModifications = async (content: string): Promise<TextModification[]> => {
+    try {
+      const result = await analyzeText(content);
+      return result.modifications || [];
+    } catch (error) {
+      console.error("LLM分析失败:", error);
+      // 出错时返回空数组
+      return [];
+    }
+  };
+  
   const optimizeContent = async (content: string) => {
     if (content.trim().length < 10) {
       toast.error("内容太短，无法优化");
@@ -74,78 +97,36 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     setIsProcessing(true);
     setOriginalContent(content);
+    setOptimizedContent(""); // 清空之前的结果
     
     try {
-      // 在实际应用中，这里会调用AI服务
-      // 为了演示目的，我们用setTimeout模拟API调用
-      const prompt = getPromptForType(currentPromptType, customPrompt);
+      // 使用LLM分析可修改部分
+      const modifications = await analyzeTextModifications(content);
+      setTextModifications(modifications);
       
-      setTimeout(() => {
-        // 模拟AI优化（简单示例 - 会被实际API替换）
-        let optimized = simulateOptimization(content, currentPromptType);
-        
-        setOptimizedContent(optimized);
-        setIsProcessing(false);
-      }, 2000);
+      // 开始流式输出
+      setIsStreaming(true);
+      
+      // 使用API优化内容，启用流式输出
+      await optimizeText(
+        content, 
+        currentPromptType, 
+        customPrompt,
+        (chunkContent) => {
+          // 处理流式输出的回调函数
+          setOptimizedContent(chunkContent);
+        }
+      );
+      
+      // 流式输出完成
+      setIsStreaming(false);
       
     } catch (error) {
       console.error("优化内容时出错:", error);
       toast.error("优化内容失败。请重试。");
+      setIsStreaming(false);
+    } finally {
       setIsProcessing(false);
-    }
-  };
-  
-  // 这只是一个模拟 - 在实际应用中会被真正的AI替换
-  const simulateOptimization = (content: string, type: OptimizationType): string => {
-    switch (type) {
-      case "improve":
-        return content
-          .split("。 ")
-          .map(sentence => sentence.trim())
-          .filter(sentence => sentence.length > 0)
-          .map(sentence => {
-            // 为句子添加一些变化
-            if (sentence.length < 10) return sentence;
-            if (Math.random() > 0.7) {
-              return `确实，${sentence.toLowerCase()}`;
-            } else if (Math.random() > 0.5) {
-              return `值得注意的是，${sentence.toLowerCase()}`;
-            } else {
-              return sentence.charAt(0).toUpperCase() + sentence.slice(1);
-            }
-          })
-          .join("。 ");
-          
-      case "simplify":
-        return content
-          .split("。 ")
-          .map(sentence => {
-            // 通过缩短句子来简化
-            if (sentence.length > 15) {
-              const words = sentence.split(" ");
-              if (words.length > 8) {
-                return words.slice(0, 8).join(" ");
-              }
-            }
-            return sentence;
-          })
-          .join("。 ");
-          
-      case "persuasive":
-        return `${content} 这是一个绝佳的机会，您绝对不应该错过。立即行动以确保这些好处！`;
-        
-      case "professional":
-        return `我们很高兴提供以下信息：${content.replace(/我 /g, "我们 ").replace(/我的 /g, "我们的 ")}。如果您需要任何澄清，请随时与我们联系。`;
-        
-      case "creative":
-        return `想象一个${content.toLowerCase()}的世界。这个迷人的可能性为创新和发现开辟了无限机会！`;
-        
-      case "custom":
-        // 对于自定义，只是添加一些编辑修饰
-        return `${content} [根据您的具体指示应用了自定义优化]`;
-        
-      default:
-        return content;
     }
   };
   
@@ -154,6 +135,8 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setOriginalContent(optimizedContent);
       setOptimizedContent("");
       saveToHistory();
+      // 接受优化后清空修改建议
+      setTextModifications([]);
     }
   };
   
@@ -188,6 +171,8 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setOriginalContent(item.original);
     setOptimizedContent(item.optimized);
     setCurrentPromptType(item.type as OptimizationType);
+    // 加载历史记录时清空修改建议
+    setTextModifications([]);
   };
   
   return (
@@ -197,8 +182,10 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         optimizedContent,
         contentHistory,
         isProcessing,
+        isStreaming,  // 新增：提供流式状态
         currentPromptType,
         customPrompt,
+        textModifications,
         setOriginalContent,
         setOptimizedContent,
         optimizeContent,
